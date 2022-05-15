@@ -11,3 +11,4 @@ if (process.env.DATABASE_URL) {
 }
 
 fs.writeFileSync('./ormconfig.json', config);
+
