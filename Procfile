@@ -1,2 +1,2 @@
 web: npm run start:prod
-release: npx typeorm migration:run
+release: npm run typeorm migration:run
