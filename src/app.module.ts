@@ -17,9 +17,7 @@ import { join } from 'path';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
-    TypeOrmModule.forRoot({
-
-    }),
+    TypeOrmModule.forRoot(JSON.parse(process.env.ORM_CONFIG)),
     GithubModule,
   ],
   controllers: [],
