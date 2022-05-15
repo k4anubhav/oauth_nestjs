@@ -4,4 +4,4 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-fs.writeFileSync('./ormconfig.json', content);
+fs.writeFileSync('./ormconfig.json', process.env.ORM_CONFIG);
