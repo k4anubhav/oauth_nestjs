@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<script>
+  function createRepo() {
+    const name = document.getElementById("repo-name").value;
+    const private_ = document.querySelector("input[type=\"radio\"][name=\"repo_status\"]:checked").value === "true";
+    fetch("/action/github/create-repo/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${access_token}`
+      },
+      body: JSON.stringify({
+        name: name,
+        private: private_
+      })
+    }).then((response) => {
+      if (response.ok) {
+        response.json().then((data) => {
+          console.log(data);
+          document.getElementById("repo-info-name").innerText = `Repo: ${data.name}`;
+          document.getElementById("repo-info-link").href = data.url;
+          show("repo-info");
+        });
+      } else {
+        show("something-wrong");
+      }
+    });
+    return false;
+  }
+
+  const show = (id) => {
+    const toHide = ["loader", "login", "create-repo", "repo-info", "something-wrong"];
+    toHide.forEach((item) => {
+      document.getElementById(item).hidden = item !== id;
+    });
+  };
+</script>
+<body>
+<div class="container">
+  <div class="loader" id="loader"></div>
+  <div id="login" hidden>
+    <button id="login-button" onclick="window.open('/auth/github/login/', '_self')">Login</button>
+  </div>
+  <div id="create-repo" hidden>
+    <form onsubmit="return createRepo()">
+      <div class="container">
+        <label for="repo-name">Repo name</label>
+        <input type="text" id="repo-name" placeholder="Repo name" required minlength="4"><br>
+        <div>
+          <input type="radio" id="private" name="repo_status" value="true" checked="checked">
+          <label for="private">Private</label><br>
+          <input type="radio" id="public" name="repo_status" value="false">
+          <label for="public">Public</label><br>
+        </div>
+      </div>
+
+      <button id="create-repo-button" type="submit">Create Repo</button>
+    </form>
+
+  </div>
+  <div id="repo-info" hidden>
+    <div class="container">
+
+      <h1 id="repo-info-name"></h1>
+      <h1><a id="repo-info-link" href="">Repo Link</a></h1>
+    </div>
+  </div>
+  <div id="something-wrong" hidden>
+    Something went wrong
+  </div>
+</div>
+<script>
+  const access_token = localStorage.getItem("access_token");
+  if (access_token) {
+    fetch("/me", {
+      headers: {
+        "Authorization": `Bearer ${access_token}`
+      }
+    }).then(res => {
+      if (res.status === 200) {
+        show("create-repo");
+      } else {
+        localStorage.removeItem("access_token");
+        show("login");
+      }
+    });
+  } else {
+    show("login");
+  }
+</script>
+</body>
+</html>

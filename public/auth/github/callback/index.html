@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pleas12e Wait...</title>
+</head>
+<body>
+<script>
+  // get url parameter
+  let params = new window.URLSearchParams(window.location.search);
+  let code = params.get("code");
+  console.log(code, "code");
+  if (code) {
+    fetch("/auth/github/exchange-code/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        code: code
+      })
+    }).then((data) => {
+      return data.json();
+    }).then((data) => {
+      console.log(data, "data");
+      if (data.access_token) {
+        // save access_token to localStorage
+        localStorage.setItem("access_token", data.access_token);
+        window.location.href = "/";
+      } else {
+        localStorage.removeItem("access_token");
+        window.location.href = "/auth/github/login/";
+      }
+    });
+  } else {
+    localStorage.removeItem("access_token");
+    window.location.href = "/auth/github/login/";
+  }
+</script>
+</body>
+</html>
